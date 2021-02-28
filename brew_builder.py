@@ -517,7 +517,7 @@ class BrewBuild(object):
                     if i == 19:
                         line[1] = str(round(BG, 3))
                     if i == 20:
-                    	self.PB_volume = self.boil_volume - 0.75 * self.boil_time / 60
+                        self.PB_volume = self.boil_volume - 0.75 * self.boil_time / 60
                         line[1] = str(self.boil_volume - 0.75 * self.boil_time / 60)
                     if i == 21:
                         PB_GU = BG_GU * self.boil_volume / (self.boil_volume - 0.75 * self.boil_time / 60)
