@@ -145,6 +145,79 @@ class BrewBuild(object):
 
     mash_volume: float
         volume of water in mash in gallons
+
+    Atttributes
+    -----------
+
+    OG: float
+        original gravity of beer
+
+    FG: float
+        final gravity of beer
+
+    color: float
+        SRM color of beer
+
+    IBU: float
+        bitterness in IBU of beer
+
+    ABV: float
+        final abv of beer
+
+    df_grain_bill: pandas.DataFrame
+        dataframe with database info on grain bill
+
+    df_hop_bill: pandas.DataFrame
+        dataframe with database info on hop bill
+
+    df_yeast: pandas.DataFrame
+        dataframe with database info on yeast selected
+
+    df_style: pandas.DataFrame
+        dataframe with database info on style selected
+
+    MG: float
+        gravity of the mash before adding extracts
+
+    BG: float
+        gravity of wort pre-boiling and after adding
+        extract and extra boil water (if any)
+
+    PB: float
+        post-boil gravity
+
+    PB_volume: float
+        post-boil volume of wort
+
+    Methods
+    -------
+
+    calc_OG():
+        calculate the original gravity of beer
+
+    calc_FG():
+        calculate the final gravity of beer
+
+    calc_ABV(OG, FG):
+        calculate ABV of beer based on OG and FG
+
+    calc_color():
+        calculate the SRM color of beer
+
+    calc_IBU():
+        calculate the bitterness in IBU of beer
+
+    build_recipe(name):
+        do all calculations and build out recipe. Results
+        are outputted to a csv file
+
+    interactive_sheet():
+        create an ipywidget that is an interactive spreadsheet
+
+    update_recipe_from_sheet(sheet, name):
+        take any updates from ipysheet and adjust variables in
+        BrewBuild object and redo the recipe outputted to another
+        csv
     """
 
     def __init__(self, grain_bill, hop_bill, yeast, target_volume,
@@ -193,6 +266,12 @@ class BrewBuild(object):
             sql_query = "SELECT * FROM style as s WHERE s.id = "
             sql_query += str(self.style)
             self.df_style = pd.read_sql_query(sql_query, self.con)
+
+        # add variables for brew day values
+        self.MG = None
+        self.BG = None
+        self.PB = None
+        self.PB_volume = None
 
     def calc_OG(self):
         """
@@ -433,14 +512,17 @@ class BrewBuild(object):
                         # https://www.brewersfriend.com/2010/06/12/water-volume-management-in-all-grain-brewing/
                         MG_GU /= (self.mash_volume - 0.125 * weight)
                         MG = MG_GU / 1000 + 1
+                        self.MG = round(MG, 3)
                         line[1] = str(round(MG, 3))
                     if i == 19:
                         line[1] = str(round(BG, 3))
                     if i == 20:
+                    	self.PB_volume = self.boil_volume - 0.75 * self.boil_time / 60
                         line[1] = str(self.boil_volume - 0.75 * self.boil_time / 60)
                     if i == 21:
                         PB_GU = BG_GU * self.boil_volume / (self.boil_volume - 0.75 * self.boil_time / 60)
                         PB = PB_GU / 1000 + 1
+                        self.PB = round(PB, 3)
                         line[1] = str(round(PB, 3))
                 # write to new file
                 fw.write(",".join(line))
