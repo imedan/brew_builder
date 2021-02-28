@@ -460,7 +460,7 @@ class BrewBuild(object):
                             line[3] = 'X'
 
                     # add fermentables
-                    if i - 3 <= len(self.df_grain_bill) - 1:
+                    if i - 3 <= len(self.grain_bill) - 1:
                         idx = self.df_grain_bill.index[self.df_grain_bill['id'] == self.grain_bill[i-3][0]].to_list()[0]
                         line[5] = self.df_grain_bill.loc[idx, 'name'].replace(',', '')
                         line[6] = str(self.grain_bill[i-3][1])
@@ -475,7 +475,7 @@ class BrewBuild(object):
                         line[8] = str(int(round(OG_GU / self.target_volume, 0)))
 
                     # add hops
-                    if i - 3 <= len(self.df_hop_bill) - 1:
+                    if i - 3 <= len(self.hop_bill) - 1:
                         idx = self.df_hop_bill.index[self.df_hop_bill['id'] == self.hop_bill[i-3][0]].to_list()[0]
                         line[10] = self.df_hop_bill.loc[idx, 'name'].replace(',', '')
                         line[11] = str(self.hop_bill[i-3][1])
