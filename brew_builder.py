@@ -510,7 +510,7 @@ class BrewBuild(object):
 
         cell_target_volume = cell(2, 1, self.target_volume, background_color = 'yellow')
         cell_boil_volume = cell(3, 1, self.boil_volume, background_color = 'yellow')
-        cell_boil_time = cell(4, 1, self.boil_time)
+        cell_boil_time = cell(4, 1, self.boil_time, background_color='yellow')
         cell_mash_temp = cell(5, 1, self.mash_temp, background_color = 'yellow')
         cell_OG = cell(6, 1, self.OG, background_color = 'red')
         cell_FG = cell(7, 1, self.FG, background_color = 'red')
@@ -519,6 +519,99 @@ class BrewBuild(object):
         cell_mash_efficiency = cell(10, 1, self.mash_efficiency, background_color = 'yellow')
         cell_ABV =cell(11, 1, self.ABV, background_color = 'red')
 
+        # brew day cells
+        cell_mash_volume = cell(16, 1, self.mash_volume, background_color='yellow')
+        cell_mash_grav = cell(17, 1, background_color='red')
+        @calculation(inputs=cell_ferms + [cell_mash_efficiency, cell_mash_volume], output=cell_mash_grav)
+        def calc_mash_grav(*args):
+            cell_mash_efficiency = args[-2]
+            cell_mash_volume = args[-1]
+            MG_GU = 0
+            weight = 0
+
+            for j in range(len(self.grain_bill)):
+                idx = self.df_grain_bill.index[self.df_grain_bill['id'] == self.grain_bill[j][0]].to_list()[0]
+                if self.grain_bill[j][2] == 0:
+                    MG_GU += args[j] * (self.df_grain_bill.loc[idx, 'yield'] / 100) * 46 * (cell_mash_efficiency / 100)
+                    weight += args[j]
+            # post mash volume adjustment based on loss of 0.125 gal / lb from
+            # https://www.brewersfriend.com/2010/06/12/water-volume-management-in-all-grain-brewing/
+            MG_GU /= (cell_mash_volume - 0.125 * weight)
+            MG = MG_GU / 1000 + 1
+            return round(MG, 3)
+        cell_BG = cell(18, 1, background_color='red')
+        @calculation(inputs=cell_ferms + [cell_mash_efficiency, cell_boil_volume, cell_target_volume], output=cell_BG)
+        def calc_BG(*args):
+            cell_mash_efficiency = args[-3]
+            cell_boil_volume = args[-2]
+            cell_target_volume = args[-1]
+            BG_GU = 0
+
+            for i in range(len(self.grain_bill)):
+                idx = self.df_grain_bill.index[self.df_grain_bill['id'] == self.grain_bill[i][0]].to_list()[0]
+                if self.grain_bill[i][2] == 0:
+                    BG_GU += args[i] * (self.df_grain_bill.loc[idx, 'yield'] / 100) * 46 * (cell_mash_efficiency / 100)
+                else:
+                    BG_GU +=  args[i] * (self.df_grain_bill.loc[idx, 'yield'] / 100) * 46
+            BG_GU /= cell_boil_volume
+            BG = BG_GU / 1000 + 1
+            return round(BG, 3)
+        cell_PB_volume = cell(19, 1, background_color='red')
+        @calculation(inputs=[cell_boil_volume, cell_boil_time], output=cell_PB_volume)
+        def calc_PB_volume(cell_boil_volume, cell_boil_time):
+            return cell_boil_volume - 0.75 * cell_boil_time / 60
+        cell_PB_grav = cell(20, 1, background_color='red')
+        @calculation(inputs=[cell_BG, cell_boil_volume, cell_boil_time], output=cell_PB_grav)
+        def calc_PB_grav(cell_BG, cell_boil_volume, cell_boil_time):
+            BG_GU = (cell_BG - 1) * 1000
+            PB_GU = BG_GU * cell_boil_volume / (cell_boil_volume - 0.75 * cell_boil_time / 60)
+            PB = PB_GU / 1000 + 1
+            return round(PB, 3)
+
+        # add style cells
+        cell_OG_style = cell(6, 2, str(self.df_style.loc[0, 'og_min']) + '-' + str(self.df_style.loc[0, 'og_max']))
+        cell_FG_style = cell(7, 2, str(self.df_style.loc[0, 'fg_min']) + '-' + str(self.df_style.loc[0, 'fg_max']))
+        cell_IBU_style = cell(8, 2, str(self.df_style.loc[0, 'ibu_min']) + '-' + str(self.df_style.loc[0, 'ibu_max']))
+        cell_color_style = cell(9, 2, str(self.df_style.loc[0, 'color_min']) + '-' + str(self.df_style.loc[0, 'color_max']))
+        cell_ABV_style = cell(11, 2, str(self.df_style.loc[0, 'abv_min']) + '-' + str(self.df_style.loc[0, 'abv_max']))
+        # add checks for style
+        cell_OG_style_check = cell(6, 3, background_color='red')
+        @calculation(inputs=[cell_OG], output=cell_OG_style_check)
+        def OG_check(cell_OG):
+            if cell_OG < self.df_style.loc[0, 'og_min'] or cell_OG > self.df_style.loc[0, 'og_max']:
+                return 'X'
+            else:
+                return ''
+        cell_FG_style_check = cell(7, 3, background_color='red')
+        @calculation(inputs=[cell_FG], output=cell_FG_style_check)
+        def FG_check(cell_FG):
+            if cell_FG < self.df_style.loc[0, 'fg_min'] or cell_FG > self.df_style.loc[0, 'fg_max']:
+                return 'X'
+            else:
+                return ''
+        cell_IBU_style_check = cell(8, 3, background_color='red')
+        @calculation(inputs=[cell_IBU], output=cell_IBU_style_check)
+        def IBU_check(cell_IBU):
+            if cell_IBU < self.df_style.loc[0, 'ibu_min'] or cell_IBU > self.df_style.loc[0, 'ibu_max']:
+                return 'X'
+            else:
+                return ''
+        cell_color_style_check = cell(9, 3, background_color='red')
+        @calculation(inputs=[cell_color], output=cell_color_style_check)
+        def color_check(cell_color):
+            if cell_color < self.df_style.loc[0, 'color_min'] or cell_color > self.df_style.loc[0, 'color_max']:
+                return 'X'
+            else:
+                return ''
+        cell_ABV_style_check = cell(11, 3, background_color='red')
+        @calculation(inputs=[cell_ABV], output=cell_ABV_style_check)
+        def ABV_check(cell_ABV):
+            if cell_ABV < self.df_style.loc[0, 'abv_min'] or cell_ABV > self.df_style.loc[0, 'abv_max']:
+                return 'X'
+            else:
+                return ''
+
+        # add summary calculations
         @calculation(inputs=[cell_OG, cell_FG], output=cell_ABV)
         def cell_ABV_calc(OG, FG):
         	return self.calc_ABV(OG, FG)
