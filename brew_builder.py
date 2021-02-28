@@ -5,6 +5,7 @@ import numpy as np
 import ipywidgets as widgets
 from ipywidgets import interact, fixed
 from ipysheet import sheet, cell, calculation
+import pickle
 
 
 def search_db(con, tab_name, tab_column, keyword):
@@ -855,3 +856,47 @@ class BrewBuild(object):
 
         # now build the recipe again
         self.build_recipe(name)
+
+    def pickle_build(self, name):
+        """
+        pickle your build so you can open it later
+        """
+
+        build = {}
+        build['grain_bill'] = self.grain_bill
+        build['hop_bill'] = self.hop_bill
+        build['yeast'] = self.yeast
+        build['target_volume'] = self.target_volume
+        build['boil_volume'] = self.boil_volume
+        build['mash_temp'] = self.mash_temp
+        build['boil_time'] = self.boil_time
+        build['mash_efficiency'] = self.mash_efficiency
+        build['style'] = self.style
+        build['mash_volume'] = self.mash_volume
+
+        with open(name, 'wb') as f:
+            pickle.dump(build, f)
+
+
+def build_from_pickle(name, con):
+    """
+    build a BrewBuild object from a past session that
+    was pickled
+
+    Parameters
+    ----------
+
+    name: str
+        name of the pickle file
+
+    con: sqlite3 connection
+        connection to the sqlite database
+    """
+
+    with open(name, 'rb') as f:
+        build = pickle.load(f)
+
+    brew = BrewBuild(build['grain_bill'], build['hop_bill'], build['yeast'], build['target_volume'],
+                     build['boil_volume'], build['mash_temp'], con, boil_time=build['boil_time'],
+                     mash_efficiency=build['mash_efficiency'], style=build['style'], mash_volume=build['mash_volume'])
+    return brew
