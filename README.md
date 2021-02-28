@@ -6,8 +6,7 @@ To see an example use of this code, look at the example Jupyter Notebook in this
 
 # Demo Notebook
 
-<!DOCTYPE html>
-<html>
+```html
 <head><meta charset="utf-8" />
 
 <title>brew_builder_demo</title>
@@ -13607,4 +13606,4 @@ var element = $('#89becfa4-e66e-45a5-800b-26f5322ab984');
 </script>
 
 
-</html>
+```
