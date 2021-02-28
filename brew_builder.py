@@ -512,7 +512,7 @@ class BrewBuild(object):
         cell_boil_volume = cell(3, 1, self.boil_volume, background_color = 'yellow')
         cell_boil_time = cell(4, 1, self.boil_time)
         cell_mash_temp = cell(5, 1, self.mash_temp, background_color = 'yellow')
-        cell_OG = cell(6, 1, self.calc_OG(), background_color = 'red')
+        cell_OG = cell(6, 1, self.OG, background_color = 'red')
         cell_FG = cell(7, 1, self.FG, background_color = 'red')
         cell_IBU = cell(8, 1, self.IBU, background_color = 'red')
         cell_color = cell(9, 1, self.color, background_color = 'red')
@@ -613,3 +613,68 @@ class BrewBuild(object):
             return round(SRM, 1)
 
         return sheet1
+
+    def update_recipe_from_sheet(self, sheet1, name):
+        """
+        update your recipe based on what was changed in interactive sheet
+
+        Parameters
+        ---------
+        sheet1: ipysheet
+            sheet from ipysheet
+
+        name: str
+            name of the file to store updated recipe in
+        """
+
+        # go through all cells to update values
+        for c in sheet1.cells:
+            # add in changes in summary table
+            if c.row_start == 2 and c.column_start == 1:
+                self.target_volume = c.value
+            if c.row_start == 3 and c.column_start == 1:
+                self.boil_volume = c.value
+            if c.row_start == 4 and c.column_start == 1:
+                self.boil_time = c.value
+            if c.row_start == 5 and c.column_start == 1:
+                self.mash_temp = c.value
+            if c.row_start == 10 and c.column_start == 1:
+                self.mash_efficiency = c.value
+
+            # add changes to fermentables
+            for i in range(len(self.grain_bill)):
+                if c.row_start == 2 + i and c.column_start == 6:
+                    self.grain_bill[i][1] = c.value
+
+            # add changes to hops
+            for i in range(len(self.hop_bill)):
+                if c.row_start == 2 + i and c.column_start == 11:
+                    self.hop_bill[i][1] = c.value
+                if c.row_start == 2 + i and c.column_start == 12:
+                    self.hop_bill[i][2] = c.value
+
+            # add change to yeast atten
+            if c.row_start == 2 and c.column_start == 16:
+                self.df_yeast.loc[0, 'attenuation'] = c.value
+
+        # update dataframes with new info
+
+        # create dataframes for each bill
+        # doing this will let me change them then
+        # before building the recipe
+        sql_query = "SELECT * FROM fermentable as f WHERE f.id = "
+        for i in range(len(self.grain_bill)):
+            sql_query += str(self.grain_bill[i][0])
+            if i + 1 < len(self.grain_bill):
+                sql_query += " or f.id = "
+        self.df_grain_bill = pd.read_sql_query(sql_query, self.con)
+
+        sql_query = "SELECT * FROM hop as h WHERE h.id = "
+        for i in range(len(self.hop_bill)):
+            sql_query += str(self.hop_bill[i][0])
+            if i + 1 < len(self.hop_bill):
+                sql_query += " or h.id = "
+        self.df_hop_bill = pd.read_sql_query(sql_query, self.con)
+
+        # now build the recipe again
+        self.build_recipe(name)
