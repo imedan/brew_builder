@@ -6,4 +6,4 @@ To see an example use of this code, look at the example Jupyter Notebook in this
 
 # Demo Notebook
 
-The demo notebook can be used and run on your own machine. Within this repository, if you would like to look at the dome with the interactive cells used for searching the database and editing recipes, look at the brew_builder_demo.html file.
+The demo notebook can be used and run on your own machine. Within this repository, if you would like to look at the demo with the interactive cells used for searching the database and editing recipes, follow this [link](https://imedan.github.io/brew_builder/brew_builder_demo.html) to displace the notebook as an html
