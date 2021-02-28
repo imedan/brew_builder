@@ -1,18 +1,18 @@
-Files: database/*
+# Files: database/*
 
 Copyright: 2009-2016, Philip G. Lee <rocketman768@gmail.com>
 
 License: GPL-3
 
 
-Files: * (not including database/*)
+# Files: * (not including database/*)
 
 Copyright: 2021, Ilija Medan
 
 License: BSD 3-Clause
 
 
-License: GPL-3
+# License: GPL-3
 
     This package is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ License: GPL-3
     Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA, or visit
     http://www.gnu.org/copyleft/gpl.html
 
-License: BSD 3-Clause
+# License: BSD 3-Clause
 
     Copyright (c) 2021, Ilija Medan
     All rights reserved.
