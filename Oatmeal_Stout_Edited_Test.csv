@@ -1,12 +1,12 @@
 ﻿Summary,,,,,Fermentables,,,,,Hops,,,,,Yeast,,,,
 Category,Value,Style Min-Max,Style Fit?,,Name,Amount (lbs),Use,GU Contribution,,Name,Amount (oz),Boil Time (min),IBU,,Name,Attenuation (listed),Attenuation (adjusted),Min Temp (F),Max Temp (F)
-Batch Size,2.5,,,,Black (Patent) Malt,0.25,Mash,1,,Willamette,1.0,60.0,23.4,,Safale S-04,75.0,73.125,59.0,75.2
+Batch Size,2.5,,,,Black (Patent) Malt,0.25,Mash,1,,Willamette,1.0,60.0,23.6,,Safale S-04,75.0,73.125,59.0,75.2
 Boil Size,1.75,,,,Oats Flaked,1.0,Mash,7,,Fuggles,0.5,20.0,6.4,,,,,,
 Boil Time,60,,,,Dry Extract (DME) - Light,1.0,Extract,17,,,,,,,,,,,
 Mash Temp,155,,,,Dry Extract (DME) - Amber,1.0,Extract,17,,,,,,,,,,,
 OG,1.055,1.048-1.065,,,Briess - 6 Row Brewers Malt,1.5,Mash,10,,,,,,,,,,,
 FG,1.014,1.01-1.018,,,Briess - Chocolate Malt,0.25,Mash,1,,,,,,,,,,,
-Bitterness,29.8,25.0-40.0,,,,,,,,,,,,,,,,,
+Bitterness,30.0,25.0-40.0,,,,,,,,,,,,,,,,,
 Color,33.9,22.0-40.0,,,,,,,,,,,,,,,,,
 Efficiency,48,,,,,,,,,,,,,,,,,,
 ABV,5.38,4.2-5.9,,,,,,,,,,,,,,,,,
@@ -18,4 +18,4 @@ Mash Volume,1.5,,,,,,,,,,,,,,,,,,
 Post-Mash Gravity,1.044,,,,,,,,,,,,,,,,,,
 Pre-boil Gravity,1.078,,,,,,,,,,,,,,,,,,
 Post-boil Volume,1.0,,,,,,,,,,,,,,,,,,
-Post-boil Gravity,1.137,,,,,,,,,,,,,,,,,,
+Post-boil Gravity,1.136,,,,,,,,,,,,,,,,,,
